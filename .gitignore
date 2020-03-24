@@ -44,7 +44,6 @@ kglm-model/ms_train_perplexity/*
 
 ##kg-bert####
 kg-bert/output_*/
-kg-bert/data/*
 
 # Python
 
