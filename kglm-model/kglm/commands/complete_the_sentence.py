@@ -65,10 +65,7 @@ def _get_predictor(args: argparse.Namespace) -> Predictor:
                            weights_file=args.weights_file,
                            cuda_device=args.cuda_device,
                            overrides=args.overrides)
-    print("*************3*******MANOJS********************")
     mlines = inspect.getsource(CompleteTheSentencePredictor.from_archive)
-    print(mlines)
-    print("*************3*******MANOJS********************")
 
     return CompleteTheSentencePredictor.from_archive(model, 'complete-the-sentence')
     #return CompleteTheSentencePredictor.from_archive(model, sampler,
@@ -158,9 +155,6 @@ class _PredictManager:
             self._output_file.close()
 
 def _predict(args: argparse.Namespace) -> None:
-    print("*************2*******MANOJS********************")
-    print(args)
-    print("*************2*******MANOJS********************")
     predictor = _get_predictor(args)
 
     if args.silent and not args.output_file:
