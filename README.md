@@ -15,5 +15,5 @@ python -m kglm.run evaluate-perplexity --include-package kglm ms_train/model.tar
 * Complete the sentence:
 <!-- Note: changes to the file - kglm/commands/complete_the_sentence.py -->
 ```sh
-python -m kglm.run complete-the-sentence ms_train/model.tar.gz ms_train_perplexity/model.tar.gz backup/data/manojs2.jsonl --include-package kglm
+python -m kglm.run complete-the-sentence ms_train/model.tar.gz ms_train_perplexity/model.tar.gz experiments/complete_the_sentence.jsonl --include-package kglm
 ```
