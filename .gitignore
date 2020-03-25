@@ -50,7 +50,7 @@ kg-bert/output_*/
 *.pyc
 __pycache__
 .venv/
-.idea
+.idea/
 
 # Testing
 
