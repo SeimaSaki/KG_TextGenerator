@@ -100,7 +100,6 @@ class AliasDatabase:
     def tensorize(self, vocab: Vocabulary):
         """
         Creates a list of tensors from the alias lookup.
-
         After dataset creation, we'll mainly want to work with alias lists as lists of padded
         tensors and their associated masks. This needs to be done **after** the vocabulary has
         been created. Accordingly, in our current approach, this method must be called in the

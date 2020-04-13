@@ -198,6 +198,7 @@ class Kglm(Model):
             token = self.vocab.get_token_from_index(entity_id, 'entity_ids')
             raw_entity_id = self.vocab.get_token_index(token, 'raw_entity_ids')
             raw_entity_ids[tuple(index)] = raw_entity_id
+        print("raw_entities_ids", raw_entity_ids)
         return raw_entity_ids
 
     def predict_knowledge_graph_entities(self,
@@ -278,7 +279,7 @@ class Kglm(Model):
 
             # Add any predicted tail entities to recent entities
             self._recent_entities.insert(current_tail_ids, current_mask)
-
+        print("parent_ids, relations, derived_entity_ids, derived_raw_entity_ids", parent_ids, relations, derived_entity_ids, derived_raw_entity_ids)
         return parent_ids, relations, derived_entity_ids, derived_raw_entity_ids
 
     def sample(self,
@@ -381,7 +382,7 @@ class Kglm(Model):
             target_probs = masked_softmax(concatenated_scores, score_mask)
             out_dict['target_probs'] = target_probs.detach()
             out_dict['alias_indices'] = alias_indices.view(batch_size, -1)
-
+        print("out_dict", out_dict)    
         return out_dict
 
     @overrides
