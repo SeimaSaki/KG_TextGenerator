@@ -29,6 +29,7 @@ class KnowledgeGraphLookup:
         print("Length of entity_idx_to_token[i]: entries staring with Q...", len(entity_idx_to_token))
         all_relations: List[torch.Tensor] = []
         all_tail_ids: List[torch.Tensor] = []
+        #with open('relation_ss.txt' , 'a') as ss_the_file:
         for i in tqdm(range(len(entity_idx_to_token))):
             entity_id = entity_idx_to_token[i]
             try:
@@ -50,7 +51,9 @@ class KnowledgeGraphLookup:
                     relations = [self._vocab.get_token_index(t, 'relations') for t in relation_tokens]
                     tail_ids = [self._vocab.get_token_index(t, 'raw_entity_ids') for t in tail_id_tokens]
                     # Convert to tensors
-                    print(entity_id + '\t' + relation_tokens + '\t' + tail_id_tokens)
+                #for m in range(len(relation_tokens)):
+                    #if m is not 0:
+                        #print(relation_tokens[m], file = ss_the_file)
                     #print("relation_tokens::", relation_tokens)
                     #print("tail_id_tokens::", tail_id_tokens)
                     relations = torch.LongTensor(relations)
@@ -59,7 +62,7 @@ class KnowledgeGraphLookup:
             all_relations.append(relations)
             all_tail_ids.append(tail_ids)
         return all_relations, all_tail_ids
-
+        #ss_the_file.close()
     def __call__(self,
                  parent_ids: torch.LongTensor) -> torch.Tensor:
         """Returns all relations of the form:
@@ -100,6 +103,6 @@ class KnowledgeGraphLookup:
             parent_ids_list.append(parent_id)
             relations_list.append(relations.to(device=parent_ids.device))
             tail_ids_list.append(tail_ids.to(device=parent_ids.device))
-
+            #print("inds, parent_id, parent_ids, relations, tail_ids", inds, parent_id, parent_ids, relations, tail_ids)       
         return indices, parent_ids_list, relations_list, tail_ids_list
 

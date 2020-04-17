@@ -252,6 +252,7 @@ class KGProcessor(DataProcessor):
                             if tmp_triple_str not in lines_str_set:
                                 break
                         tmp_tail_text = ent2text[tmp_tail]
+                        print("tmp_tail_text", tmp_tail_text)
                         examples.append(
                             InputExample(guid=guid, text_a=text_a, text_b=text_b, text_c = tmp_tail_text, label="0"))                                                  
         return examples
@@ -379,11 +380,12 @@ def _truncate_seq_triple(tokens_a, tokens_b, tokens_c, max_length):
         total_length = len(tokens_a) + len(tokens_b) + len(tokens_c)
         if total_length <= max_length:
             break
-        if len(tokens_a) > len(tokens_b) and len(tokens_a) > len(tokens_c):
+        #print("tokens_a, tokens_b, tokens_c", len(tokens_a), len(tokens_b), len(tokens_c))
+        if len(tokens_a) >= len(tokens_b) and len(tokens_a) >= len(tokens_c):
             tokens_a.pop()
-        elif len(tokens_b) > len(tokens_a) and len(tokens_b) > len(tokens_c):
+        elif len(tokens_b) >= len(tokens_a) and len(tokens_b) >= len(tokens_c):
             tokens_b.pop()
-        elif len(tokens_c) > len(tokens_a) and len(tokens_c) > len(tokens_b):
+        elif len(tokens_c) >= len(tokens_a) and len(tokens_c) >= len(tokens_b):
             tokens_c.pop()
         else:
             tokens_c.pop()
@@ -493,7 +495,7 @@ def main():
     parser.add_argument('--server_ip', type=str, default='', help="Can be used for distant debugging.")
     parser.add_argument('--server_port', type=str, default='', help="Can be used for distant debugging.")
     args = parser.parse_args()
-
+    
     if args.server_ip and args.server_port:
         # Distant debugging - see https://code.visualstudio.com/docs/python/debugging#_attach-to-a-local-script
         import ptvsd
@@ -525,7 +527,6 @@ def main():
     if args.gradient_accumulation_steps < 1:
         raise ValueError("Invalid gradient_accumulation_steps parameter: {}, should be >= 1".format(
                             args.gradient_accumulation_steps))
-
     args.train_batch_size = args.train_batch_size // args.gradient_accumulation_steps
     args.seed = random.randint(1, 200)
     random.seed(args.seed)
@@ -554,20 +555,24 @@ def main():
     num_labels = len(label_list)
 
     entity_list = processor.get_entities(args.data_dir)
+    #print("**********************")
     #print(entity_list)
 
     tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
-
     train_examples = None
     num_train_optimization_steps = 0
+    print("Reading train examples:")
     if args.do_train:
+        print("start")
         train_examples = processor.get_train_examples(args.data_dir)
+        print("len(train_examples)",len(train_examples))
         num_train_optimization_steps = int(
             len(train_examples) / args.train_batch_size / args.gradient_accumulation_steps) * args.num_train_epochs
         if args.local_rank != -1:
             num_train_optimization_steps = num_train_optimization_steps // torch.distributed.get_world_size()
 
     # Prepare model
+    print("*****************************")
     cache_dir = args.cache_dir if args.cache_dir else os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed_{}'.format(args.local_rank))
     model = BertForSequenceClassification.from_pretrained(args.bert_model,
               cache_dir=cache_dir,
@@ -575,6 +580,7 @@ def main():
     if args.fp16:
         model.half()
     model.to(device)
+    print("*****************************")
     if args.local_rank != -1:
         try:
             from apex.parallel import DistributedDataParallel as DDP

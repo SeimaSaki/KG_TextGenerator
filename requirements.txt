@@ -1,6 +1,18 @@
-torch==1.1.0
+#torch==1.1.0
+torch>=0.4.1
 git+git://github.com/rloganiv/allennlp.git@pytorch-grad-clip
 
 # Coverage reports
 pytest-cov
 codecov
+
+# progress bars in model download and training scripts
+tqdm
+# Accessing files from S3 directly.
+boto3
+# Used for downloading models over HTTP
+requests
+# bert
+pytorch-pretrained-bert>=0.6.2
+# wikipedia
+wikipedia
