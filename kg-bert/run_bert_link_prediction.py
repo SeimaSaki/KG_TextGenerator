@@ -252,7 +252,7 @@ class KGProcessor(DataProcessor):
                             if tmp_triple_str not in lines_str_set:
                                 break
                         tmp_tail_text = ent2text[tmp_tail]
-                        print("tmp_tail_text", tmp_tail_text)
+                        #print("tmp_tail_text", tmp_tail_text)
                         examples.append(
                             InputExample(guid=guid, text_a=text_a, text_b=text_b, text_c = tmp_tail_text, label="0"))                                                  
         return examples
@@ -572,7 +572,7 @@ def main():
             num_train_optimization_steps = num_train_optimization_steps // torch.distributed.get_world_size()
 
     # Prepare model
-    print("*****************************")
+    #print("*****************************")
     cache_dir = args.cache_dir if args.cache_dir else os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed_{}'.format(args.local_rank))
     model = BertForSequenceClassification.from_pretrained(args.bert_model,
               cache_dir=cache_dir,
@@ -580,7 +580,7 @@ def main():
     if args.fp16:
         model.half()
     model.to(device)
-    print("*****************************")
+    #print("*****************************")
     if args.local_rank != -1:
         try:
             from apex.parallel import DistributedDataParallel as DDP
