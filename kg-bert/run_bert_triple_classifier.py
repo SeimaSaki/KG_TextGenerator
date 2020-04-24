@@ -40,7 +40,10 @@ from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE, WE
 from pytorch_pretrained_bert.modeling import BertForSequenceClassification, BertConfig
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.optimization import BertAdam, WarmupLinearSchedule
-
+print("torch.cuda.is_available()", torch.cuda.is_available())
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+distributed = torch.distributed.is_initialized()
+print("Distributed..", distributed)
 os.environ['CUDA_VISIBLE_DEVICES']= '6'
 #torch.backends.cudnn.deterministic = True
 

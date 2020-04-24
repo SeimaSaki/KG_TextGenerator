@@ -425,6 +425,11 @@ def main():
                         required=True,
                         help="The output directory where the model predictions and checkpoints will be written.")
 
+    parser.add_argument("--checkpoint_dir",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="The directory to load checkpoint.")
     ## Other parameters
     parser.add_argument("--cache_dir",
                         default="",
@@ -516,7 +521,8 @@ def main():
         n_gpu = 1
         # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
         torch.distributed.init_process_group(backend='nccl')
-
+    
+    print("SEIMA...........device is", device)
     logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                         datefmt = '%m/%d/%Y %H:%M:%S',
                         level = logging.INFO if args.local_rank in [-1, 0] else logging.WARN)
@@ -557,8 +563,10 @@ def main():
     entity_list = processor.get_entities(args.data_dir)
     #print("**********************")
     #print(entity_list)
-
+    ##change here..
     tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
+    #tokenizer = BertTokenizer.from_pretrained(args.checkpoint_dir, do_lower_case=args.do_lower_case)
+    num_labels=num_labels
     train_examples = None
     num_train_optimization_steps = 0
     print("Reading train examples:")
@@ -574,6 +582,7 @@ def main():
     # Prepare model
     #print("*****************************")
     cache_dir = args.cache_dir if args.cache_dir else os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed_{}'.format(args.local_rank))
+    #change here
     model = BertForSequenceClassification.from_pretrained(args.bert_model,
               cache_dir=cache_dir,
               num_labels=num_labels)
@@ -704,6 +713,7 @@ def main():
         model = BertForSequenceClassification.from_pretrained(args.output_dir, num_labels=num_labels)
         tokenizer = BertTokenizer.from_pretrained(args.output_dir, do_lower_case=args.do_lower_case)
     else:
+        #changed here
         model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
     model.to(device)
 
