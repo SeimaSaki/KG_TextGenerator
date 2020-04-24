@@ -317,13 +317,15 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
         if tokens_c:
             tokens += tokens_c + ["[SEP]"]
             segment_ids += [0] * (len(tokens_c) + 1)        
+        #print("*****")
+        #print("tokens", tokens)
 
         input_ids = tokenizer.convert_tokens_to_ids(tokens)
-
+        #print("input_ids", input_ids) 
         # The mask has 1 for real tokens and 0 for padding tokens. Only real
         # tokens are attended to.
         input_mask = [1] * len(input_ids)
-
+        #print("input_mask", input_mask) 
         # Zero-pad up to the sequence length.
         padding = [0] * (max_seq_length - len(input_ids))
         input_ids += padding
@@ -393,6 +395,8 @@ def _truncate_seq_triple(tokens_a, tokens_b, tokens_c, max_length):
             tokens_c.pop()
 
 def simple_accuracy(preds, labels):
+    #print("preds", preds)
+    #print("labels",labels)
     return (preds == labels).mean()
 
 def compute_metrics(task_name, preds, labels):
@@ -562,7 +566,6 @@ def main():
 
     label_list = processor.get_labels(args.data_dir)
     num_labels = len(label_list)
-
     entity_list = processor.get_entities(args.data_dir)
     #print("**********************")
     #print(entity_list)
@@ -633,7 +636,12 @@ def main():
                              lr=args.learning_rate,
                              warmup=args.warmup_proportion,
                              t_total=num_train_optimization_steps)
-
+    
+    ########inserted here....
+   
+    label_map = {i : label for i, label in enumerate(label_list)}
+    print("label_map", label_map)
+    print("label_list", label_list)
     global_step = 0
     nb_tr_steps = 0
     tr_loss = 0
@@ -717,8 +725,8 @@ def main():
         tokenizer = BertTokenizer.from_pretrained(args.output_dir, do_lower_case=args.do_lower_case)
     else:
         #changed here...........seima.................
-        #model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
-        model = BertForSequenceClassification.from_pretrained(args.output_dir, num_labels=num_labels)
+        model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
+        #model = BertForSequenceClassification.from_pretrained(args.output_dir, num_labels=num_labels)
     model.to(device)
 
     if args.do_eval and (args.local_rank == -1 or torch.distributed.get_rank() == 0):
@@ -774,15 +782,18 @@ def main():
 
         eval_loss = eval_loss / nb_eval_steps
         preds = preds[0]
-
+        
+        #print("******************************")
         preds = np.argmax(preds, axis=1)
         result = compute_metrics(task_name, preds, all_label_ids.numpy())
         loss = tr_loss/nb_tr_steps if args.do_train else None
 
+        #print("preds....", label_map[preds[0]]) 
+        #print("label_map[1]",label_map[1])
+
         result['eval_loss'] = eval_loss
         result['global_step'] = global_step
         result['loss'] = loss
-
         output_eval_file = os.path.join(args.output_dir, "eval_results.txt")
         with open(output_eval_file, "w") as writer:
             logger.info("***** Eval results *****")
@@ -854,7 +865,7 @@ def main():
         all_label_ids = all_label_ids.numpy()
 
         preds = np.argmax(preds, axis=1)
-
+        print("*********preds***********",preds)
         result = compute_metrics(task_name, preds, all_label_ids)
         loss = tr_loss/nb_tr_steps if args.do_train else None
 
@@ -936,7 +947,7 @@ def main():
                     if tmp_triple_str not in all_triples_str_set:
                         # may be slow
                         head_corrupt_list.append(tmp_triple)
-
+            #print("head_corrupt_list", head_corrupt_list)
             tmp_examples = processor._create_examples(head_corrupt_list, "test", args.data_dir)
             print(len(tmp_examples))
             tmp_features = convert_examples_to_features(tmp_examples, label_list, args.max_seq_length, tokenizer, print_info = False)
@@ -959,7 +970,10 @@ def main():
                 input_mask = input_mask.to(device)
                 segment_ids = segment_ids.to(device)
                 label_ids = label_ids.to(device)
-                
+                #print("input_ids",input_ids)
+                #print("input_mask", input_mask)
+                #print("segment_ids",segment_ids)
+                #print("label_ids", label_ids)    
                 with torch.no_grad():
                     logits = model(input_ids, segment_ids, input_mask, labels=None)
                 if len(preds) == 0:
@@ -971,6 +985,7 @@ def main():
                     preds[0] = np.append(preds[0], batch_logits, axis=0)       
 
             preds = preds[0]
+            print("*****link prediction*******", preds)
             # get the dimension corresponding to current label 1
             #print(preds, preds.shape)
             rel_values = preds[:, all_label_ids[0]]
@@ -997,20 +1012,20 @@ def main():
                         tail_corrupt_list.append(tmp_triple)
 
             tmp_examples = processor._create_examples(tail_corrupt_list, "test", args.data_dir)
-            #print(len(tmp_examples))
+            print(len(tmp_examples))
             tmp_features = convert_examples_to_features(tmp_examples, label_list, args.max_seq_length, tokenizer, print_info = False)
             all_input_ids = torch.tensor([f.input_ids for f in tmp_features], dtype=torch.long)
             all_input_mask = torch.tensor([f.input_mask for f in tmp_features], dtype=torch.long)
             all_segment_ids = torch.tensor([f.segment_ids for f in tmp_features], dtype=torch.long)
             all_label_ids = torch.tensor([f.label_id for f in tmp_features], dtype=torch.long)
-
+            
             eval_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
             # Run prediction for temp data
             eval_sampler = SequentialSampler(eval_data)
             eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=args.eval_batch_size)
             model.eval()
             preds = []        
-
+            
             for input_ids, input_mask, segment_ids, label_ids in tqdm(eval_dataloader, desc="Testing"):
             
                 input_ids = input_ids.to(device)
@@ -1031,14 +1046,18 @@ def main():
             preds = preds[0]
             # get the dimension corresponding to current label 1
             rel_values = preds[:, all_label_ids[0]]
+         #   print("rel_values", rel_values)
+          #  print("all_label_ids[0]", all_label_ids[0])
             rel_values = torch.tensor(rel_values)
             _, argsort1 = torch.sort(rel_values, descending=True)
             argsort1 = argsort1.cpu().numpy()
+           # print("****this one???", np.where(argsort1 == 0))
             rank2 = np.where(argsort1 == 0)[0][0]
             ranks.append(rank2+1)
             ranks_right.append(rank2+1)
             print('right: ', rank2)
-            print('mean rank until now: ', np.mean(ranks))
+            #print("label_map[rank2]", label_map[rank2])
+            #print('mean rank until now: ', np.mean(ranks))
             if rank2 < 10:
                 top_ten_hit_count += 1
             print("hit@10 until now: ", top_ten_hit_count * 1.0 / len(ranks))

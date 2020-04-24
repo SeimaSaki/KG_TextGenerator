@@ -9,40 +9,12 @@ custom_model = BertForSequenceClassification.from_pretrained(output_dir, output_
 custom_tokenizer = BertTokenizer.from_pretrained(output_dir, do_lower_case=True)
 model = Summarizer(custom_model=custom_model, custom_tokenizer=custom_tokenizer)
 body = '''
-The Chrysler Building, the famous art deco New York skyscraper, will be sold for a small fraction of its previous s
-ales price.
-The deal, first reported by The Real Deal, was for $150 million, according to a source familiar with the deal.
-Mubadala, an Abu Dhabi investment fund, purchased 90% of the building for $800 million in 2008.
-Real estate firm Tishman Speyer had owned the other 10%.
-The buyer is RFR Holding, a New York real estate company.
-Officials with Tishman and RFR did not immediately respond to a request for comments.
-It's unclear when the deal will close.
-The building sold fairly quickly after being publicly placed on the market only two months ago.
-The sale was handled by CBRE Group.
-The incentive to sell the building at such a huge loss was due to the soaring rent the owners pay to Cooper Union, 
-a New York college, for the land under the building.
-The rent is rising from $7.75 million last year to $32.5 million this year to $41 million in 2028.
-Meantime, rents in the building itself are not rising nearly that fast.
-While the building is an iconic landmark in the New York skyline, it is competing against newer office towers with 
-large floor-to-ceiling windows and all the modern amenities.
-Still the building is among the best known in the city, even to people who have never been to New York.
-It is famous for its triangle-shaped, vaulted windows worked into the stylized crown, along with its distinctive ea
-gle gargoyles near the top.
-It has been featured prominently in many films, including Men in Black 3, Spider-Man, Armageddon, Two Weeks Notice 
-and Independence Day.
-The previous sale took place just before the 2008 financial meltdown led to a plunge in real estate prices.
-Still there have been a number of high profile skyscrapers purchased for top dollar in recent years, including the 
-Waldorf Astoria hotel, which Chinese firm Anbang Insurance purchased in 2016 for nearly $2 billion, and the Willis 
-Tower in Chicago, which was formerly known as Sears Tower, once the world's tallest.
-Blackstone Group (BX) bought it for $1.3 billion 2015.
-The Chrysler Building was the headquarters of the American automaker until 1953, but it was named for and owned by 
-Chrysler chief Walter Chrysler, not the company itself.
-Walter Chrysler had set out to build the tallest building in the world, a competition at that time with another Man
-hattan skyscraper under construction at 40 Wall Street at the south end of Manhattan. He kept secret the plans for 
-the spire that would grace the top of the building, building it inside the structure and out of view of the public 
-until 40 Wall Street was complete.
-Once the competitor could rise no higher, the spire of the Chrysler building was raised into view, giving it the ti
-tle.
+The United States of America (USA), commonly known as the United States (U.S. or US) or America, is a country consisting of 50 states, a federal district, five major self-governing territories, and various possessions.At 3.8 million square miles (9.8 million km2), it is the world's third- or fourth-largest country by total area. Most of the country is located in central North America between Canada and Mexico. With an estimated population of over 328 million, the U.S. is the third most populous country in the world (after China and India). The capital is Washington, D.C., and the most populous city is New York City.
+Paleo-Indians migrated from Siberia to the North American mainland at least 12,000 years ago. European colonization began in the 16th century. The United States emerged from the thirteen British colonies established along the East Coast. Numerous disputes between Great Britain and the colonies led to the American Revolutionary War lasting between 1775 and 1783, leading to independence. The United States embarked on a vigorous expansion across North America throughout the 19th century—gradually acquiring new territories,displacing Native Americans, and admitting new states—until 1848 when it spanned the continent. During the second half of the 19th century, the American Civil War led to the abolition of slavery in the United States. The Spanish–American War and World War I confirmed the country's status as a global military power.
+The United States emerged from World War II as a global superpower. It was the first country to develop nuclear weapons and is the only country to have used them in warfare. During the Cold War, the United States and the Soviet Union competed in the Space Race, culminating with the 1969 Apollo 11 mission, the spaceflight that first landed humans on the Moon. The end of the Cold War and collapse of the Soviet Union in 1991 left the United States as the world's sole superpower.
+The United States is a federal republic and a representative democracy. It is a founding member of the United Nations, World Bank, International Monetary Fund, Organization of American States (OAS), NATO, and other international organizations. It is a permanent member of the United Nations Security Council.
+A highly developed country, the United States is the world's largest economy by nominal GDP, the second-largest by purchasing power parity, and accounts for approximately a quarter of global GDP.The United States is the world's largest importer and the second-largest exporter of goods, by value.Although its population is 4% of the world total,it holds 29.4% of the total wealth in the world, the largest share of global wealth concentrated in a single country.Despite income and wealth disparities, the United States continues to rank very high in measures of socioeconomic performance, including average wage, median income, median wealth, human development, per capita GDP, and worker productivity.It is the foremost military power in the world, making up more than a third of global military spending,and is a leading political, cultural, and scientific force internationally.
+
 '''
 result = model(body, min_length=60)
 full = ''.join(result)
