@@ -41,6 +41,7 @@ kglm-model/backup/*
 kglm-model/data/*
 kglm-model/ms_train/*
 kglm-model/ms_train_perplexity/*
+kglm-model/model_ouput/*
 
 ##kg-bert####
 kg-bert/output_*/
