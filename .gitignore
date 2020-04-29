@@ -46,6 +46,7 @@ kglm-model/model/*
 kglm-model/complete_alias.tsv
 kglm-model/output_data/*
 kglm-model/pred_output.txt
+kglm-model/backup/*
 ##kg-bert####
 kg-bert/output_*/
 kg-bert/*
