@@ -94,7 +94,7 @@
     },
     "trainer": {
         "type": "lm",
-        "num_epochs": 2,
+        "num_epochs": 1,
         "cuda_device": 0,
         // "grad_clipping": 0.25,
         // "optimizer": {

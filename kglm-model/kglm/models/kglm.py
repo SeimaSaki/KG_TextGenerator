@@ -401,7 +401,6 @@ class Kglm(Model):
                 alias_copy_inds: torch.Tensor = None,
                 **kwargs) -> Dict[str, torch.Tensor]:
         
-        #print("******************SEIMA*********************")
         #print("raw_entity_ids", raw_entity_ids)
         # Tensorize the alias_database - this will only perform the operation once.
         alias_database = metadata[0]['alias_database']
