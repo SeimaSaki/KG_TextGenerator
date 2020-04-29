@@ -518,15 +518,6 @@ def main():
     processors = {
         "kg": KGProcessor,
     }
-#    if args.local_rank == -1 or args.no_cuda:
- #       device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
-  #      n_gpu = torch.cuda.device_count()
-   # else:
-    #    torch.cuda.set_device(args.local_rank)
-     #   device = torch.device("cuda", args.local_rank)
-      #  n_gpu = 1
-        # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
-       # torch.distributed.init_process_group(backend='nccl')
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     n_gpu = 1
     print("Device:", device)
@@ -567,16 +558,10 @@ def main():
     label_list = processor.get_labels(args.data_dir)
     num_labels = len(label_list)
     entity_list = processor.get_entities(args.data_dir)
-    #print("**********************")
-    #print(entity_list)
-    ##change here..
     tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
-    #tokenizer = BertTokenizer.from_pretrained(args.checkpoint_dir, do_lower_case=args.do_lower_case)
     num_labels=num_labels
     train_examples = None
     num_train_optimization_steps = 0
-    print(".......DEVICE.........", device)
-    print("Reading train examples:")
     if args.do_train:
         train_examples = processor.get_train_examples(args.data_dir)
         print("len(train_examples)",len(train_examples))
@@ -586,7 +571,6 @@ def main():
             num_train_optimization_steps = num_train_optimization_steps // torch.distributed.get_world_size()
 
     # Prepare model
-    #print("*****************************")
     cache_dir = args.cache_dir if args.cache_dir else os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed_{}'.format(args.local_rank))
     #change here
     model = BertForSequenceClassification.from_pretrained(args.bert_model,
@@ -595,7 +579,6 @@ def main():
     if args.fp16:
         model.half()
     model.to(device)
-    #print("*****************************")
     if args.local_rank != -1:
         try:
             from apex.parallel import DistributedDataParallel as DDP
@@ -637,11 +620,8 @@ def main():
                              warmup=args.warmup_proportion,
                              t_total=num_train_optimization_steps)
     
-    ########inserted here....
    
     label_map = {i : label for i, label in enumerate(label_list)}
-    print("label_map", label_map)
-    print("label_list", label_list)
     global_step = 0
     nb_tr_steps = 0
     tr_loss = 0
@@ -724,7 +704,6 @@ def main():
         model = BertForSequenceClassification.from_pretrained(args.output_dir, num_labels=num_labels)
         tokenizer = BertTokenizer.from_pretrained(args.output_dir, do_lower_case=args.do_lower_case)
     else:
-        #changed here...........seima.................
         model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
         #model = BertForSequenceClassification.from_pretrained(args.output_dir, num_labels=num_labels)
     model.to(device)
@@ -783,14 +762,9 @@ def main():
         eval_loss = eval_loss / nb_eval_steps
         preds = preds[0]
         
-        #print("******************************")
         preds = np.argmax(preds, axis=1)
         result = compute_metrics(task_name, preds, all_label_ids.numpy())
         loss = tr_loss/nb_tr_steps if args.do_train else None
-
-        #print("preds....", label_map[preds[0]]) 
-        #print("label_map[1]",label_map[1])
-
         result['eval_loss'] = eval_loss
         result['global_step'] = global_step
         result['loss'] = loss
@@ -985,7 +959,6 @@ def main():
                     preds[0] = np.append(preds[0], batch_logits, axis=0)       
 
             preds = preds[0]
-            print("*****link prediction*******", preds)
             # get the dimension corresponding to current label 1
             #print(preds, preds.shape)
             rel_values = preds[:, all_label_ids[0]]
