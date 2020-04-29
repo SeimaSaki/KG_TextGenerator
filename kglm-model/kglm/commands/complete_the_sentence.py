@@ -5,7 +5,7 @@ from typing import List, Iterator, Optional
 import argparse
 import sys
 import json
-# manojs added this
+
 import inspect
 
 from allennlp.commands.subcommand import Subcommand
@@ -16,7 +16,10 @@ from allennlp.predictors.predictor import Predictor, JsonDict
 from allennlp.data import Instance
 
 from kglm.predictors import CompleteTheSentencePredictor
-
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.metrics import f1_score
+y_true = []
+y_pred = []
 class CompleteTheSentence(Subcommand):
     def add_subparser(self, name: str, parser: argparse._SubParsersAction) -> argparse.ArgumentParser:
         # pylint: disable=protected-access
@@ -25,7 +28,7 @@ class CompleteTheSentence(Subcommand):
                 name, description=description, help='Use a trained model to complete sentences.')
 
         subparser.add_argument('model_archive_file', type=str, help='the archived model to make predictions with')
-        subparser.add_argument('sampler_archive_file', type=str, help='the archived model to make samples with')
+        #subparser.add_argument('sampler_archive_file', type=str, help='the archived model to make samples with')
         subparser.add_argument('input_file', type=str, help='path to input file')
 
         subparser.add_argument('--output-file', type=str, help='path to output file')
@@ -39,7 +42,7 @@ class CompleteTheSentence(Subcommand):
         subparser.add_argument('--silent', action='store_true', help='do not print output to stdout')
 
         cuda_device = subparser.add_mutually_exclusive_group(required=False)
-        cuda_device.add_argument('--cuda-device', type=int, default=-1, help='id of GPU to use (if any)')
+        cuda_device.add_argument('--cuda-device', type=int, default=0, help='id of GPU to use (if any)')
 
         subparser.add_argument('--use-dataset-reader',
                                action='store_true',
@@ -61,12 +64,11 @@ def _get_predictor(args: argparse.Namespace) -> Predictor:
                          weights_file=args.weights_file,
                          cuda_device=args.cuda_device,
                          overrides=args.overrides)
-    sampler = load_archive(args.sampler_archive_file,
-                           weights_file=args.weights_file,
-                           cuda_device=args.cuda_device,
-                           overrides=args.overrides)
+    #sampler = load_archive(args.sampler_archive_file,
+    #                       weights_file=args.weights_file,
+    #                       cuda_device=args.cuda_device,
+    #                       overrides=args.overrides)
     mlines = inspect.getsource(CompleteTheSentencePredictor.from_archive)
-
     return CompleteTheSentencePredictor.from_archive(model, 'complete-the-sentence')
     #return CompleteTheSentencePredictor.from_archive(model, sampler,
     #                                                 'complete-the-sentence')
@@ -94,6 +96,7 @@ class _PredictManager:
             self._dataset_reader = predictor._dataset_reader # pylint: disable=protected-access
         else:
             self._dataset_reader = None
+        self.score = 0
 
     def _predict_json(self, batch_data: List[JsonDict]) -> Iterator[str]:
         if len(batch_data) == 1:
@@ -116,8 +119,26 @@ class _PredictManager:
                                          model_input: str = None) -> None:
         if self._print_to_console:
             if model_input is not None:
-                print("input: ", model_input)
-            print("prediction: ", prediction)
+                mi = json.loads(model_input)
+                expected_entity = mi['expected_tail']
+                print("input: ", expected_entity)
+#                print("input: ", model_input)
+ #               print("expected:", model_input)
+            pr = json.loads(prediction)
+            predicted_entity = pr['words'][0]
+            print("prediction: ", predicted_entity)
+#            print("prediction: ", type(prediction))
+        with open('pred_output.txt' , 'a') as the_file:
+            for i in range(len(mi['prefix'])):
+                print(mi['prefix'][i], end =" ", file = the_file)
+            print('\n' + "expected: " + expected_entity + '\t' + "predicted: " + predicted_entity, file=the_file)
+            y_true.append(expected_entity)
+            y_pred.append(predicted_entity)
+            if expected_entity == predicted_entity:
+                self.score += self.score
+                print("score:", self.score, file=the_file) 
+        the_file.close()
+
         if self._output_file is not None:
             self._output_file.write(prediction)
 
@@ -150,7 +171,11 @@ class _PredictManager:
             for batch_json in lazy_groups_of(self._get_json_data(), self._batch_size):
                 for model_input_json, result in zip(batch_json, self._predict_json(batch_json)):
                     self._maybe_print_to_console_and_file(result, json.dumps(model_input_json))
+        print("Expected tail, Prediction",y_true, y_pred)
+        binarizer = MultiLabelBinarizer()
 
+        f1 = f1_score(y_true, y_pred, average='macro')
+        print("F1 Score:",f1) 
         if self._output_file is not None:
             self._output_file.close()
 
