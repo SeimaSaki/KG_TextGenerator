@@ -44,7 +44,8 @@ kglm-model/ms_train_perplexity/*
 kglm-model/model_ouput/*
 kglm-model/model/*
 kglm-model/complete_alias.tsv
-
+kglm-model/output_data/*
+kglm-model/pred_output.txt
 ##kg-bert####
 kg-bert/output_*/
 kg-bert/*
