@@ -25,7 +25,6 @@ class KnowledgeGraphLookup:
             knowledge_graph = pickle.load(f)
 
         entity_idx_to_token = self._vocab.get_index_to_token_vocabulary('entity_ids')
-        print("*******************************SEIMA*************************")
         print("Length of entity_idx_to_token[i]: entries staring with Q...", len(entity_idx_to_token))
         all_relations: List[torch.Tensor] = []
         all_tail_ids: List[torch.Tensor] = []

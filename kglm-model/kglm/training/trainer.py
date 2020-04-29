@@ -30,7 +30,6 @@ from allennlp.training.trainer_base import TrainerBase
 from allennlp.training import util as training_util
 from allennlp.training.moving_average import MovingAverage
 
-from kglm.training.nt_asgd import NTASGDOptimizer
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

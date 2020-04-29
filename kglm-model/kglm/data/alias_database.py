@@ -56,7 +56,6 @@ class AliasDatabase:
         # Right now we only support loading the alias database from a pickle file.
         with open(path, 'rb') as f:
             alias_lookup = pickle.load(f)
-        print("***********************************SEIMA*********************************************",'\n')
         with open('complete_alias.tsv' , 'a') as the_file:
             for entity, aliases in Tqdm.tqdm(alias_lookup.items()):
                 print(entity + '\t' + str(aliases), file=the_file)
@@ -80,7 +79,6 @@ class AliasDatabase:
                 unique_tokens.update(tokenized_alias)
             id_map = {token: i + 1 for i, token in enumerate(unique_tokens)}
             id_map_lookup[entity] = id_map
-            #print("*******SEIMA******************************")
             #print("unique_tokens", unique_tokens)
             #print("id_map_lookup[entity]", id_map_lookup[entity])
             # Lastly create an array associating the tokens in the alias to their corresponding ids.
@@ -175,8 +173,6 @@ class AliasDatabase:
                                              requires_grad=False)
         local_tensor = entity_ids.new_zeros(batch_size, sequence_length, MAX_ALIASES, MAX_TOKENS,
                                             requires_grad=False)
-        print("************************SEIMA*****************************")
-        #print("
         for i in range(batch_size):
             for j in range(sequence_length):
                 entity_id = entity_ids[i, j]

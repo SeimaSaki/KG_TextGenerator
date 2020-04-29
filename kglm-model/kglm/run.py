@@ -14,12 +14,10 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s - %(message)s
 
 # pylint: disable=wrong-import-position
 from allennlp.commands import main
-from kglm.commands import EvaluatePerplexity
 from kglm.commands import CompleteTheSentence
 
 if __name__ == "__main__":
     main(prog="allennlp",
          subcommand_overrides={
-             'evaluate-perplexity': EvaluatePerplexity(),
              'complete-the-sentence': CompleteTheSentence(),
          })
