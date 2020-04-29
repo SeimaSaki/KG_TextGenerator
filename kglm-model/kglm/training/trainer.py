@@ -462,17 +462,6 @@ class LmTrainer(TrainerBase):
                 if key.startswith('gpu_'):
                     metrics["peak_"+key] = max(metrics.get("peak_"+key, 0), value)
 
-            # If we are using an NT-ASGD optimizer, we replace the model parameters with "average"
-            # parameters when evaluating / checkpointing.
-            if isinstance(self.optimizer, NTASGDOptimizer):
-                if self.optimizer.triggered:
-                    tmp = {}
-                    for prm in self.model.parameters():
-                        tmp[prm] = prm.data.clone()
-                        try:
-                            prm.data = self.optimizer.active_optimizer.state[prm]['ax']
-                        except KeyError:
-                            continue
 
             if self._validation_data is not None:
                 with torch.no_grad():
@@ -531,14 +520,6 @@ class LmTrainer(TrainerBase):
                 formatted_time = str(datetime.timedelta(seconds=int(estimated_time_remaining)))
                 logger.info("Estimated training time remaining: %s", formatted_time)
 
-            # Revert parameters back to original if using ASGD
-            if isinstance(self.optimizer, NTASGDOptimizer):
-                try:
-                    if self.optimizer.triggered:
-                        for prm in self.model.parameters():
-                            prm.data = tmp[prm]
-                except UnboundLocalError:  # Happens when 1st triggered
-                    continue
 
             epochs_trained += 1
 
