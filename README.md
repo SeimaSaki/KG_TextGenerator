@@ -1,4 +1,4 @@
-This project is a part of the course CE7455, Deep Learning for NLP, Nanyang Technological University.
+This project is a part of the course CE7455, Deep Learning for NLP at Nanyang Technological University.
 We have enhanced the original [KG-BERT](https://github.com/yao8839836/kg-bert) and evaluated it against the [KGLM](https://github.com/rloganiv/kglm-model).
 # KG_TextGenerator
 
