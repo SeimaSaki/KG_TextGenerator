@@ -374,11 +374,11 @@ def _truncate_seq_triple(tokens_a, tokens_b, tokens_c, max_length):
         total_length = len(tokens_a) + len(tokens_b) + len(tokens_c)
         if total_length <= max_length:
             break
-        if len(tokens_a) > len(tokens_b) and len(tokens_a) > len(tokens_c):
+        if len(tokens_a) >= len(tokens_b) and len(tokens_a) >= len(tokens_c):
             tokens_a.pop()
-        elif len(tokens_b) > len(tokens_a) and len(tokens_b) > len(tokens_c):
+        elif len(tokens_b) >= len(tokens_a) and len(tokens_b) >= len(tokens_c):
             tokens_b.pop()
-        elif len(tokens_c) > len(tokens_a) and len(tokens_c) > len(tokens_b):
+        elif len(tokens_c) >= len(tokens_a) and len(tokens_c) >= len(tokens_b):
             tokens_c.pop()
         else:
             tokens_c.pop()
