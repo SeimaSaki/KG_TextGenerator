@@ -40,6 +40,10 @@ from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE, WE
 from pytorch_pretrained_bert.modeling import BertForSequenceClassification, BertConfig
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.optimization import BertAdam, WarmupLinearSchedule
+print("torch.cuda.is_available()", torch.cuda.is_available())
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+distributed = torch.distributed.is_initialized()
+print("Distributed..", distributed)
 
 os.environ['CUDA_VISIBLE_DEVICES']= '3'
 #torch.backends.cudnn.deterministic = True
@@ -408,16 +412,18 @@ def main():
         "kg": KGProcessor,
     }
 
-    if args.local_rank == -1 or args.no_cuda:
-        device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
-        n_gpu = torch.cuda.device_count()
-    else:
-        torch.cuda.set_device(args.local_rank)
-        device = torch.device("cuda", args.local_rank)
-        n_gpu = 1
+    #if args.local_rank == -1 or args.no_cuda:
+     #   device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+      #  n_gpu = torch.cuda.device_count()
+    #else:
+     #   torch.cuda.set_device(args.local_rank)
+      #  device = torch.device("cuda", args.local_rank)
+       # n_gpu = 1
         # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
-        torch.distributed.init_process_group(backend='nccl')
-
+        #torch.distributed.init_process_group(backend='nccl')
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    n_gpu = 1
+    print("Device:", device)
     logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                         datefmt = '%m/%d/%Y %H:%M:%S',
                         level = logging.INFO if args.local_rank in [-1, 0] else logging.WARN)
