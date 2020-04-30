@@ -2,7 +2,7 @@ This project is a part of the course CE7455, Deep Learning for NLP at Nanyang Te
 We have enhanced the original [KG-BERT](https://github.com/yao8839836/kg-bert) and evaluated it against the [KGLM](https://github.com/rloganiv/kglm-model).
 # KG_TextGenerator
 
-##To use KGLM, follow the below steps: 
+## To use KGLM, follow the below steps: 
 * Training:
 ```sh
 allennlp train experiments/kglm.jsonnet -s model --include-package kglm
@@ -14,7 +14,7 @@ Note: Had to comment out the line #iterator.eval() on line 163 in file: kglm/com
 ```sh
 python -m kglm.run complete-the-sentence  model/model.tar.gz experiments/complete_the_sentence.jsonl --output-file output_data/predictions.txt --include-package kglm
 ```
-##To use KG-BERT on KG completion tasks, follow the below steps:
+## To use KG-BERT on KG completion tasks, follow the below steps:
 
 * Triple Classification:
 ```sh
