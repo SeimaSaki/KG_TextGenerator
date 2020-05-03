@@ -40,10 +40,7 @@ from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE, WE
 from pytorch_pretrained_bert.modeling import BertForSequenceClassification, BertConfig
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.optimization import BertAdam, WarmupLinearSchedule
-print("torch.cuda.is_available()", torch.cuda.is_available())
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-#distributed = torch.distributed.is_initialized()
-#print("Distributed..", distributed)
 os.environ['CUDA_VISIBLE_DEVICES']= '1'
 #torch.backends.cudnn.deterministic = True
 logger = logging.getLogger(__name__)
@@ -317,15 +314,11 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
         if tokens_c:
             tokens += tokens_c + ["[SEP]"]
             segment_ids += [0] * (len(tokens_c) + 1)        
-        #print("*****")
-        #print("tokens", tokens)
 
         input_ids = tokenizer.convert_tokens_to_ids(tokens)
-        #print("input_ids", input_ids) 
         # The mask has 1 for real tokens and 0 for padding tokens. Only real
         # tokens are attended to.
         input_mask = [1] * len(input_ids)
-        #print("input_mask", input_mask) 
         # Zero-pad up to the sequence length.
         padding = [0] * (max_seq_length - len(input_ids))
         input_ids += padding
@@ -395,8 +388,6 @@ def _truncate_seq_triple(tokens_a, tokens_b, tokens_c, max_length):
             tokens_c.pop()
 
 def simple_accuracy(preds, labels):
-    #print("preds", preds)
-    #print("labels",labels)
     return (preds == labels).mean()
 
 def compute_metrics(task_name, preds, labels):
@@ -520,7 +511,6 @@ def main():
     }
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     n_gpu = 1
-    print("Device:", device)
     logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                         datefmt = '%m/%d/%Y %H:%M:%S',
                         level = logging.INFO if args.local_rank in [-1, 0] else logging.WARN)
@@ -1019,18 +1009,13 @@ def main():
             preds = preds[0]
             # get the dimension corresponding to current label 1
             rel_values = preds[:, all_label_ids[0]]
-         #   print("rel_values", rel_values)
-          #  print("all_label_ids[0]", all_label_ids[0])
             rel_values = torch.tensor(rel_values)
             _, argsort1 = torch.sort(rel_values, descending=True)
             argsort1 = argsort1.cpu().numpy()
-           # print("****this one???", np.where(argsort1 == 0))
             rank2 = np.where(argsort1 == 0)[0][0]
             ranks.append(rank2+1)
             ranks_right.append(rank2+1)
             print('right: ', rank2)
-            #print("label_map[rank2]", label_map[rank2])
-            #print('mean rank until now: ', np.mean(ranks))
             if rank2 < 10:
                 top_ten_hit_count += 1
             print("hit@10 until now: ", top_ten_hit_count * 1.0 / len(ranks))
