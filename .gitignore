@@ -49,7 +49,6 @@ kglm-model/pred_output.txt
 kglm-model/backup/*
 ##kg-bert####
 kg-bert/output_*/
-kg-bert/*
 
 # Python
 
