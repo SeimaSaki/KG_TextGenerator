@@ -1,7 +1,6 @@
 
 ## Introduction
 
-Code for [BERT and PALs](https://arxiv.org/abs/1902.02671) using which we adapted multi-task learning for link and relation prediction; 
 `modeling.py` contains the BERT model formulation and `run_bert_link_prediction_multi.py` and `run_bert_relation_prediction_multi.py` perform multi-task training on the GLUE benchmark and KG optimization.
 
 ## Requirements
@@ -62,7 +61,7 @@ export BERT_PYTORCH_DIR=/path/to/uncased_L-12_H-768_A-12
 export GLUE_DIR=/path/to/glue/glue_data
 export SAVE_DIR=/tmp/saved
 
-Train and evaluate relation prediction with multi-tasking
+Train and evaluate relation prediction with multi-task learning
 
 python3 run_bert_relation_prediction_multi.py --seed 55 --output_dir ./pals/ --tasks all --sample 'anneal' --multi --do_train --do_eval --data_dir glue_data/ --vocab_file ./uncased_L-12_H-768_A-12/vocab.txt --bert_config_file ./configs/pals_config.json --init_checkpoint ./uncased_L-12_H-768_A-12/pytorch_model.bin --max_seq_length 128 --train_batch_size 32 --learning_rate 3e-5 --num_train_epochs 5.0 --gradient_accumulation_steps 2
 
@@ -70,7 +69,7 @@ Test the model trained above
 
 python3 run_bert_relation_prediction_multi.py --seed 42 --output_dir ./pals/ --tasks all --sample 'anneal' --multi --do_predict --data_dir glue_data/ --vocab_file ./uncased_L-12_H-768_A-12/vocab.txt --bert_config_file ./configs/pals_config.json --init_checkpoint ./pals/saved model --max_seq_length 128 --train_batch_size 32 --learning_rate 2e-5 --num_train_epochs 5.0 --gradient_accumulation_steps 2
 
-Train and evaluate link prediction with multi-tasking
+Train and evaluate link prediction with multi-task learning
 
 python3 run_bert_link_prediction_multi.py --seed 50 --output_dir ./pals/linkpred/ --tasks all --sample 'anneal' --multi --do_train --do_eval --data_dir glue_data/ --vocab_file ./uncased_L-12_H-768_A-12/vocab.txt --bert_config_file ./configs/pals_config.json --init_checkpoint ./uncased_L-12_H-768_A-12/pytorch_model.bin --max_seq_length 128 --train_batch_size 32 --learning_rate 3e-5 --num_train_epochs 5.0 --gradient_accumulation_steps 2
 
